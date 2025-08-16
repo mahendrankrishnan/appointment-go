@@ -84,6 +84,21 @@ func GetAppointments(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(list)
 }
+
+//	func GetAppointment(w http.ResponseWriter, r *http.Request) {
+//		idParam := chi.URLParam(r, "id")
+//		id, err := strconv.Atoi(idParam)
+//		if err != nil {
+//			http.Error(w, "invalid id", http.StatusBadRequest)
+//			return
+//		}
+//		appt, exists := appointments[id]
+//		if !exists {
+//			http.NotFound(w, r)
+//			return
+//		}
+//		json.NewEncoder(w).Encode(appt)
+//	}
 func GetAppointment(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
@@ -91,14 +106,36 @@ func GetAppointment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid id", http.StatusBadRequest)
 		return
 	}
-	appt, exists := appointments[id]
-	if !exists {
+
+	var appt models.Appointment
+	query := `SELECT id, appt_name, appt_type, appt_desc, appt_time FROM appointments WHERE id = $1`
+	err = DB.QueryRow(query, id).Scan(&appt.ID, &appt.ApptName, &appt.ApptType, &appt.ApptDesc, &appt.ApptTime)
+	if err == sql.ErrNoRows {
 		http.NotFound(w, r)
 		return
+	} else if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(appt)
 }
 
+//	func DeleteAppointment(w http.ResponseWriter, r *http.Request) {
+//		idParam := chi.URLParam(r, "id")
+//		id, err := strconv.Atoi(idParam)
+//		if err != nil {
+//			http.Error(w, "invalid id", http.StatusBadRequest)
+//			return
+//		}
+//		if _, exists := appointments[id]; !exists {
+//			http.NotFound(w, r)
+//			return
+//		}
+//		delete(appointments, id)
+//		w.WriteHeader(http.StatusNoContent)
+//	}
 func DeleteAppointment(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
@@ -106,10 +143,22 @@ func DeleteAppointment(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid id", http.StatusBadRequest)
 		return
 	}
-	if _, exists := appointments[id]; !exists {
+
+	result, err := DB.Exec("DELETE FROM appointments WHERE id = $1", id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if rowsAffected == 0 {
 		http.NotFound(w, r)
 		return
 	}
-	delete(appointments, id)
+
 	w.WriteHeader(http.StatusNoContent)
 }
