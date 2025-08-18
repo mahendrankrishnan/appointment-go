@@ -22,6 +22,15 @@ func SetDB(db *sql.DB) {
 	DB = db
 }
 
+// CreateAppointment godoc
+// @Summary Create a new appointment
+// @Accept json
+// @Produce json
+// @Param appointment body models.Appointment true "Appointment data"
+// @Success 201 {object} models.Appointment
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router / [post]
 func CreateAppointment(w http.ResponseWriter, r *http.Request) {
 	var appt models.Appointment
 	if err := json.NewDecoder(r.Body).Decode(&appt); err != nil {
@@ -99,6 +108,17 @@ func GetAppointments(w http.ResponseWriter, r *http.Request) {
 //		}
 //		json.NewEncoder(w).Encode(appt)
 //	}
+
+// GetAppointment godoc
+// @Summary Get appointment by ID
+// @Produce json
+// @Param id path int true "Appointment ID"
+// @Success 200 {object} models.Appointment
+// @Failure 400 {string} string "Invalid ID"
+// @Failure 404 {string} string "Not Found"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /{id} [get]
+
 func GetAppointment(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)
@@ -136,6 +156,17 @@ func GetAppointment(w http.ResponseWriter, r *http.Request) {
 //		delete(appointments, id)
 //		w.WriteHeader(http.StatusNoContent)
 //	}
+
+// DeleteAppointment godoc
+// @Summary delete appointment by ID
+// @Produce json
+// @Param id path int true "Appointment ID"
+// @Success 200 {object} models.Appointment
+// @Failure 400 {string} string "Invalid ID"
+// @Failure 404 {string} string "Not Found"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /{id} [delete]
+
 func DeleteAppointment(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idParam)

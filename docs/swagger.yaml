@@ -36,4 +36,30 @@ paths:
               $ref: '#/definitions/models.Appointment'
             type: array
       summary: List appointments
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Appointment data
+        in: body
+        name: appointment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Appointment'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Appointment'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create a new appointment
 swagger: "2.0"
