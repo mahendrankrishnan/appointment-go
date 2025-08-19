@@ -37,5 +37,5 @@ A lightweight REST API built in Go for managing appointments. The API supports f
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/your-username/go-appointment-api.git
+git clone https://github.com/mahendrankrishnan/go-appointment-api.git
 cd go-appointment-api

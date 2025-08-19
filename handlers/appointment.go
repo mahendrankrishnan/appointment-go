@@ -11,11 +11,8 @@ import (
 	"github.com/mahendrankrishnan/app1/models"
 )
 
-// You would move the appointments map and nextID into a service layer later
 var appointments = make(map[int]models.Appointment)
-var nextID = 1
 
-// Add a global DB variable (or inject via function/struct for better design)
 var DB *sql.DB
 
 func SetDB(db *sql.DB) {
@@ -38,7 +35,7 @@ func CreateAppointment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Insert into the database
+	// Insert a new appointment into the database
 	query := `INSERT INTO appointments (appt_name,appt_type, appt_desc, appt_time) VALUES ($1, $2, $3,$4) RETURNING id`
 	err := DB.QueryRow(query, appt.ApptName, appt.ApptType, appt.ApptDesc, appt.ApptTime).Scan(&appt.ID)
 	if err != nil {
